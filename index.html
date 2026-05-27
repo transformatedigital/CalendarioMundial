@@ -48,6 +48,13 @@
   .tz-btn .off{font-size:10px;opacity:.7;font-weight:500}
   .tz-btn.active{background:var(--accent);color:#04130d;border-color:transparent}
   .tz-btn.active .off{opacity:.7}
+  .tz-btn-select{position:relative}
+  .tz-btn-select .city::after{content:" ▾";font-size:10px;opacity:.7;margin-left:2px}
+  .tz-select-overlay{
+    position:absolute;inset:0;width:100%;height:100%;
+    opacity:0;cursor:pointer;font-size:16px;
+    border:0;background:transparent;
+  }
 
   /* Tabs */
   nav.tabs{
@@ -196,8 +203,40 @@
     <button class="tz-btn" data-tz="America/Mexico_City">
       <span class="city">🇲🇽 CDMX</span><span class="off" data-off></span>
     </button>
-    <button class="tz-btn" data-tz="America/New_York">
-      <span class="city">🇺🇸 N. Carolina</span><span class="off" data-off></span>
+    <button class="tz-btn tz-btn-select" id="tzCustomBtn" data-tz-custom>
+      <span class="city" id="tzCustomLabel">🇺🇸 N. Carolina</span>
+      <span class="off" data-off></span>
+      <select class="tz-select-overlay" id="tzCustomSelect" aria-label="Elige país/zona">
+        <optgroup label="Norteamérica">
+          <option value="America/New_York|🇺🇸 EE.UU. Este">🇺🇸 EE.UU. Este (NY · Miami · Boston · NC)</option>
+          <option value="America/Chicago|🇺🇸 EE.UU. Centro">🇺🇸 EE.UU. Centro (Dallas · Houston · KC)</option>
+          <option value="America/Denver|🇺🇸 EE.UU. Mont.">🇺🇸 EE.UU. Montaña (Denver)</option>
+          <option value="America/Los_Angeles|🇺🇸 EE.UU. Oeste">🇺🇸 EE.UU. Oeste (LA · SF · Seattle)</option>
+          <option value="America/Toronto|🇨🇦 Toronto">🇨🇦 Canadá Este (Toronto)</option>
+          <option value="America/Vancouver|🇨🇦 Vancouver">🇨🇦 Canadá Oeste (Vancouver)</option>
+        </optgroup>
+        <optgroup label="Sudamérica">
+          <option value="America/Argentina/Buenos_Aires|🇦🇷 Argentina">🇦🇷 Argentina</option>
+          <option value="America/Sao_Paulo|🇧🇷 Brasil">🇧🇷 Brasil</option>
+          <option value="America/Bogota|🇨🇴 Colombia">🇨🇴 Colombia · Perú · Ecuador</option>
+          <option value="America/Santiago|🇨🇱 Chile">🇨🇱 Chile</option>
+          <option value="America/Montevideo|🇺🇾 Uruguay">🇺🇾 Uruguay · Paraguay</option>
+          <option value="America/Caracas|🇻🇪 Venezuela">🇻🇪 Venezuela</option>
+        </optgroup>
+        <optgroup label="Europa">
+          <option value="Europe/London|🇬🇧 Londres">🇬🇧 Reino Unido · Portugal</option>
+          <option value="Europe/Madrid|🇪🇸 España">🇪🇸 España · Francia · Alemania · Italia</option>
+          <option value="Europe/Athens|🇬🇷 Atenas">🇬🇷 Grecia · Turquía · Egipto</option>
+        </optgroup>
+        <optgroup label="Asia · Oceanía · África">
+          <option value="Asia/Tokyo|🇯🇵 Japón">🇯🇵 Japón · Corea</option>
+          <option value="Asia/Shanghai|🇨🇳 China">🇨🇳 China</option>
+          <option value="Asia/Dubai|🇦🇪 Dubái">🇦🇪 EAU · Arabia Saudita</option>
+          <option value="Australia/Sydney|🇦🇺 Australia">🇦🇺 Australia Este</option>
+          <option value="Africa/Casablanca|🇲🇦 Marruecos">🇲🇦 Marruecos</option>
+          <option value="Africa/Johannesburg|🇿🇦 Sudáfrica">🇿🇦 Sudáfrica</option>
+        </optgroup>
+      </select>
     </button>
     <button class="tz-btn" data-tz="Asia/Seoul">
       <span class="city">🇰🇷 Seúl</span><span class="off" data-off></span>
@@ -296,6 +335,8 @@
   // ---- Estado ----
   const state = {
     tz: localStorage.getItem('mundial.tz') || 'America/Mexico_City',
+    customTz: localStorage.getItem('mundial.customTz') || 'America/New_York',
+    customLabel: localStorage.getItem('mundial.customLabel') || '🇺🇸 EE.UU. Este',
     tab: 'next',
     editing: null, // {letter, idx}
   };
@@ -352,12 +393,24 @@
   // ---- Pinta selector de zona horaria ----
   function renderTZ(){
     const now = new Date();
-    document.querySelectorAll('#tzRow .tz-btn').forEach(btn => {
+    // Botones fijos (México, Seúl)
+    document.querySelectorAll('#tzRow .tz-btn[data-tz]').forEach(btn => {
       const tz = btn.dataset.tz;
       btn.classList.toggle('active', tz === state.tz);
       const off = btn.querySelector('[data-off]');
       off.textContent = offsetLabel(tz, now);
     });
+    // Botón con selector (zona elegida por el usuario)
+    const customBtn = document.getElementById('tzCustomBtn');
+    if (customBtn) {
+      const label = document.getElementById('tzCustomLabel');
+      const off = customBtn.querySelector('[data-off]');
+      label.textContent = state.customLabel;
+      off.textContent = offsetLabel(state.customTz, now);
+      customBtn.classList.toggle('active', state.tz === state.customTz);
+      const sel = document.getElementById('tzCustomSelect');
+      if (sel) sel.value = `${state.customTz}|${state.customLabel}`;
+    }
   }
 
   // ---- Pinta tabs ----
@@ -525,8 +578,26 @@
   document.getElementById('tzRow').addEventListener('click', e => {
     const btn = e.target.closest('.tz-btn');
     if (!btn) return;
+    // Si es el botón con select, lo manejamos en el evento 'change' del <select>
+    if (btn.hasAttribute('data-tz-custom')) {
+      // El tap sobre el botón (no sobre el select abierto) lo activa con la TZ guardada
+      state.tz = state.customTz;
+      localStorage.setItem('mundial.tz', state.tz);
+      render();
+      return;
+    }
     state.tz = btn.dataset.tz;
     localStorage.setItem('mundial.tz', state.tz);
+    render();
+  });
+  document.getElementById('tzCustomSelect').addEventListener('change', e => {
+    const [tz, label] = e.target.value.split('|');
+    state.customTz = tz;
+    state.customLabel = label;
+    state.tz = tz;
+    localStorage.setItem('mundial.customTz', tz);
+    localStorage.setItem('mundial.customLabel', label);
+    localStorage.setItem('mundial.tz', tz);
     render();
   });
   document.getElementById('tabs').addEventListener('click', e => {
