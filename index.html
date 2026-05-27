@@ -213,51 +213,20 @@
     <span class="sub">USA · México · Canadá</span>
   </div>
   <div class="tz-row" id="tzRow">
-    <button class="tz-btn" data-tz="America/Mexico_City">
-      <span class="city">🇲🇽 CDMX</span><span class="off" data-off></span>
-    </button>
-    <button class="tz-btn tz-btn-select" id="tzCustomBtn" data-tz-custom>
-      <span class="city" id="tzCustomLabel">🇺🇸 N. Carolina</span>
+    <button class="tz-btn tz-btn-select" data-slot="0">
+      <span class="city" data-label></span>
       <span class="off" data-off></span>
-      <select class="tz-select-overlay" id="tzCustomSelect" aria-label="Elige país/zona">
-        <optgroup label="Norteamérica">
-          <option value="America/New_York|🇺🇸 N. Carolina">🇺🇸 North Carolina (NY · Miami · Boston)</option>
-          <option value="America/Chicago|🇺🇸 EE.UU. Centro">🇺🇸 EE.UU. Centro (Dallas · Houston · KC)</option>
-          <option value="America/Denver|🇺🇸 EE.UU. Mont.">🇺🇸 EE.UU. Montaña (Denver)</option>
-          <option value="America/Los_Angeles|🇺🇸 EE.UU. Oeste">🇺🇸 EE.UU. Oeste (LA · SF · Seattle)</option>
-          <option value="America/Toronto|🇨🇦 Toronto">🇨🇦 Canadá Este (Toronto)</option>
-          <option value="America/Vancouver|🇨🇦 Vancouver">🇨🇦 Canadá Oeste (Vancouver)</option>
-        </optgroup>
-        <optgroup label="Centroamérica">
-          <option value="America/Costa_Rica|🇨🇷 Costa Rica">🇨🇷 Costa Rica · Guatemala · El Salvador</option>
-          <option value="America/Panama|🇵🇦 Panamá">🇵🇦 Panamá</option>
-        </optgroup>
-        <optgroup label="Sudamérica">
-          <option value="America/Argentina/Buenos_Aires|🇦🇷 Argentina">🇦🇷 Argentina</option>
-          <option value="America/Sao_Paulo|🇧🇷 Brasil">🇧🇷 Brasil</option>
-          <option value="America/Bogota|🇨🇴 Colombia">🇨🇴 Colombia</option>
-          <option value="America/Guayaquil|🇪🇨 Ecuador">🇪🇨 Ecuador · Perú</option>
-          <option value="America/Santiago|🇨🇱 Chile">🇨🇱 Chile</option>
-          <option value="America/Montevideo|🇺🇾 Uruguay">🇺🇾 Uruguay · Paraguay</option>
-          <option value="America/Caracas|🇻🇪 Venezuela">🇻🇪 Venezuela</option>
-        </optgroup>
-        <optgroup label="Europa">
-          <option value="Europe/London|🇬🇧 Londres">🇬🇧 Reino Unido · Portugal</option>
-          <option value="Europe/Madrid|🇪🇸 España">🇪🇸 España · Francia · Alemania · Italia</option>
-          <option value="Europe/Athens|🇬🇷 Atenas">🇬🇷 Grecia · Turquía · Egipto</option>
-        </optgroup>
-        <optgroup label="Asia · Oceanía · África">
-          <option value="Asia/Tokyo|🇯🇵 Japón">🇯🇵 Japón · Corea</option>
-          <option value="Asia/Shanghai|🇨🇳 China">🇨🇳 China</option>
-          <option value="Asia/Dubai|🇦🇪 Dubái">🇦🇪 EAU · Arabia Saudita</option>
-          <option value="Australia/Sydney|🇦🇺 Australia">🇦🇺 Australia Este</option>
-          <option value="Africa/Casablanca|🇲🇦 Marruecos">🇲🇦 Marruecos</option>
-          <option value="Africa/Johannesburg|🇿🇦 Sudáfrica">🇿🇦 Sudáfrica</option>
-        </optgroup>
-      </select>
+      <select class="tz-select-overlay" data-select aria-label="Elige ubicación 1"></select>
     </button>
-    <button class="tz-btn" data-tz="Asia/Seoul">
-      <span class="city">🇰🇷 Seúl</span><span class="off" data-off></span>
+    <button class="tz-btn tz-btn-select" data-slot="1">
+      <span class="city" data-label></span>
+      <span class="off" data-off></span>
+      <select class="tz-select-overlay" data-select aria-label="Elige ubicación 2"></select>
+    </button>
+    <button class="tz-btn tz-btn-select" data-slot="2">
+      <span class="city" data-label></span>
+      <span class="off" data-off></span>
+      <select class="tz-select-overlay" data-select aria-label="Elige ubicación 3"></select>
     </button>
   </div>
 </header>
@@ -354,14 +323,87 @@
     return MATCHES.filter(m => m.stage === letter).sort((a,b) => a.utc.localeCompare(b.utc));
   }
 
+  // ---- Opciones de zonas horarias (compartidas por los 3 slots) ----
+  const TZ_GROUPS = [
+    { label: 'Norteamérica', opts: [
+      { tz:'America/Mexico_City',  short:'🇲🇽 CDMX',          long:'🇲🇽 México (CDMX · Guadalajara · Monterrey)' },
+      { tz:'America/New_York',     short:'🇺🇸 N. Carolina',   long:'🇺🇸 North Carolina (NY · Miami · Boston)' },
+      { tz:'America/Chicago',      short:'🇺🇸 EE.UU. Centro', long:'🇺🇸 EE.UU. Centro (Dallas · Houston · KC)' },
+      { tz:'America/Denver',       short:'🇺🇸 EE.UU. Mont.',  long:'🇺🇸 EE.UU. Montaña (Denver)' },
+      { tz:'America/Los_Angeles',  short:'🇺🇸 EE.UU. Oeste',  long:'🇺🇸 EE.UU. Oeste (LA · SF · Seattle)' },
+      { tz:'America/Toronto',      short:'🇨🇦 Toronto',       long:'🇨🇦 Canadá Este (Toronto)' },
+      { tz:'America/Vancouver',    short:'🇨🇦 Vancouver',     long:'🇨🇦 Canadá Oeste (Vancouver)' },
+    ]},
+    { label: 'Centroamérica', opts: [
+      { tz:'America/Costa_Rica', short:'🇨🇷 Costa Rica', long:'🇨🇷 Costa Rica · Guatemala · El Salvador' },
+      { tz:'America/Panama',     short:'🇵🇦 Panamá',     long:'🇵🇦 Panamá' },
+    ]},
+    { label: 'Sudamérica', opts: [
+      { tz:'America/Argentina/Buenos_Aires', short:'🇦🇷 Argentina', long:'🇦🇷 Argentina' },
+      { tz:'America/Sao_Paulo',  short:'🇧🇷 Brasil',    long:'🇧🇷 Brasil' },
+      { tz:'America/Bogota',     short:'🇨🇴 Colombia',  long:'🇨🇴 Colombia' },
+      { tz:'America/Guayaquil',  short:'🇪🇨 Ecuador',   long:'🇪🇨 Ecuador · Perú' },
+      { tz:'America/Santiago',   short:'🇨🇱 Chile',     long:'🇨🇱 Chile' },
+      { tz:'America/Montevideo', short:'🇺🇾 Uruguay',   long:'🇺🇾 Uruguay · Paraguay' },
+      { tz:'America/Caracas',    short:'🇻🇪 Venezuela', long:'🇻🇪 Venezuela' },
+    ]},
+    { label: 'Europa', opts: [
+      { tz:'Europe/London', short:'🇬🇧 Londres', long:'🇬🇧 Reino Unido · Portugal' },
+      { tz:'Europe/Madrid', short:'🇪🇸 España',  long:'🇪🇸 España · Francia · Alemania · Italia' },
+      { tz:'Europe/Athens', short:'🇬🇷 Atenas',  long:'🇬🇷 Grecia · Turquía · Egipto' },
+    ]},
+    { label: 'Asia · Oceanía · África', opts: [
+      { tz:'Asia/Seoul',          short:'🇰🇷 Seúl',      long:'🇰🇷 Corea del Sur' },
+      { tz:'Asia/Tokyo',          short:'🇯🇵 Tokio',     long:'🇯🇵 Japón' },
+      { tz:'Asia/Shanghai',       short:'🇨🇳 China',     long:'🇨🇳 China' },
+      { tz:'Asia/Dubai',          short:'🇦🇪 Dubái',     long:'🇦🇪 EAU · Arabia Saudita' },
+      { tz:'Australia/Sydney',    short:'🇦🇺 Australia', long:'🇦🇺 Australia Este' },
+      { tz:'Africa/Casablanca',   short:'🇲🇦 Marruecos', long:'🇲🇦 Marruecos' },
+      { tz:'Africa/Johannesburg', short:'🇿🇦 Sudáfrica', long:'🇿🇦 Sudáfrica' },
+    ]},
+  ];
+
+  const DEFAULT_SLOTS = [
+    { tz:'America/Mexico_City', label:'🇲🇽 CDMX' },
+    { tz:'America/New_York',    label:'🇺🇸 N. Carolina' },
+    { tz:'Asia/Seoul',          label:'🇰🇷 Seúl' },
+  ];
+
+  function loadSlots(){
+    const out = [];
+    for (let i = 0; i < 3; i++) {
+      try {
+        const raw = localStorage.getItem(`mundial.slot${i}`);
+        const obj = raw ? JSON.parse(raw) : null;
+        out.push(obj && obj.tz && obj.label ? obj : { ...DEFAULT_SLOTS[i] });
+      } catch(_) { out.push({ ...DEFAULT_SLOTS[i] }); }
+    }
+    return out;
+  }
+
   // ---- Estado ----
   const state = {
+    slots: loadSlots(),
     tz: localStorage.getItem('mundial.tz') || 'America/Mexico_City',
-    customTz: localStorage.getItem('mundial.customTz') || 'America/New_York',
-    customLabel: localStorage.getItem('mundial.customLabel') || '🇺🇸 EE.UU. Este',
     tab: 'next',
     editing: null, // {letter, idx}
   };
+  // Si la TZ activa guardada no coincide con ningún slot, caemos al slot 0
+  if (!state.slots.some(s => s.tz === state.tz)) {
+    state.tz = state.slots[0].tz;
+    localStorage.setItem('mundial.tz', state.tz);
+  }
+
+  // Construye opciones <optgroup>/<option> dentro de cada <select>
+  function populateSelects(){
+    const html = TZ_GROUPS.map(g =>
+      `<optgroup label="${g.label}">` +
+      g.opts.map(o => `<option value="${o.tz}|${o.short}">${o.long}</option>`).join('') +
+      `</optgroup>`
+    ).join('');
+    document.querySelectorAll('#tzRow [data-select]').forEach(sel => { sel.innerHTML = html; });
+  }
+  populateSelects();
 
   // ---- Helpers de fecha en TZ del usuario ----
   function partsIn(tz, date){
@@ -415,24 +457,15 @@
   // ---- Pinta selector de zona horaria ----
   function renderTZ(){
     const now = new Date();
-    // Botones fijos (México, Seúl)
-    document.querySelectorAll('#tzRow .tz-btn[data-tz]').forEach(btn => {
-      const tz = btn.dataset.tz;
-      btn.classList.toggle('active', tz === state.tz);
-      const off = btn.querySelector('[data-off]');
-      off.textContent = offsetLabel(tz, now);
+    document.querySelectorAll('#tzRow .tz-btn').forEach(btn => {
+      const idx = parseInt(btn.dataset.slot, 10);
+      const slot = state.slots[idx];
+      btn.querySelector('[data-label]').textContent = slot.label;
+      btn.querySelector('[data-off]').textContent = offsetLabel(slot.tz, now);
+      btn.classList.toggle('active', slot.tz === state.tz);
+      const sel = btn.querySelector('[data-select]');
+      if (sel) sel.value = `${slot.tz}|${slot.label}`;
     });
-    // Botón con selector (zona elegida por el usuario)
-    const customBtn = document.getElementById('tzCustomBtn');
-    if (customBtn) {
-      const label = document.getElementById('tzCustomLabel');
-      const off = customBtn.querySelector('[data-off]');
-      label.textContent = state.customLabel;
-      off.textContent = offsetLabel(state.customTz, now);
-      customBtn.classList.toggle('active', state.tz === state.customTz);
-      const sel = document.getElementById('tzCustomSelect');
-      if (sel) sel.value = `${state.customTz}|${state.customLabel}`;
-    }
   }
 
   // ---- Pinta tabs ----
@@ -598,28 +631,26 @@
   }
 
   // ---- Eventos ----
+  // Tap en el botón (no en el select desplegado) → activa la TZ guardada de ese slot
   document.getElementById('tzRow').addEventListener('click', e => {
+    if (e.target.tagName === 'SELECT') return; // dejar que el select se abra
     const btn = e.target.closest('.tz-btn');
     if (!btn) return;
-    // Si es el botón con select, lo manejamos en el evento 'change' del <select>
-    if (btn.hasAttribute('data-tz-custom')) {
-      // El tap sobre el botón (no sobre el select abierto) lo activa con la TZ guardada
-      state.tz = state.customTz;
-      localStorage.setItem('mundial.tz', state.tz);
-      render();
-      return;
-    }
-    state.tz = btn.dataset.tz;
+    const idx = parseInt(btn.dataset.slot, 10);
+    state.tz = state.slots[idx].tz;
     localStorage.setItem('mundial.tz', state.tz);
     render();
   });
-  document.getElementById('tzCustomSelect').addEventListener('change', e => {
-    const [tz, label] = e.target.value.split('|');
-    state.customTz = tz;
-    state.customLabel = label;
+  // Cambio de selección en el <select> de un slot → guarda y activa
+  document.getElementById('tzRow').addEventListener('change', e => {
+    const sel = e.target.closest('select[data-select]');
+    if (!sel) return;
+    const btn = sel.closest('.tz-btn');
+    const idx = parseInt(btn.dataset.slot, 10);
+    const [tz, label] = sel.value.split('|');
+    state.slots[idx] = { tz, label };
     state.tz = tz;
-    localStorage.setItem('mundial.customTz', tz);
-    localStorage.setItem('mundial.customLabel', label);
+    localStorage.setItem(`mundial.slot${idx}`, JSON.stringify(state.slots[idx]));
     localStorage.setItem('mundial.tz', tz);
     render();
   });

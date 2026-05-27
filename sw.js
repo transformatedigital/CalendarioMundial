@@ -1,5 +1,5 @@
 // Service worker básico: cache-first para uso offline
-const CACHE = 'mundial-2026-v6';
+const CACHE = 'mundial-2026-v7';
 const ASSETS = ['./', './index.html', './data.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {
