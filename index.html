@@ -129,6 +129,14 @@
     padding:5px 9px;border-radius:6px;font-size:11px;cursor:pointer;
   }
   .flag{display:inline-block;width:1.4em;text-align:center}
+  .flag-img{
+    width:22px;height:16px;object-fit:cover;
+    vertical-align:middle;border-radius:2px;
+    box-shadow:0 0 0 1px #ffffff15;
+    margin-right:6px;display:inline-block;
+    background:#1a2c25;
+  }
+  .gm-teams .flag-img,.match .teams .flag-img{width:20px;height:14px;margin-right:4px}
 
   /* Match cards */
   .day-group{margin-bottom:18px}
@@ -215,10 +223,15 @@
           <option value="America/Toronto|🇨🇦 Toronto">🇨🇦 Canadá Este (Toronto)</option>
           <option value="America/Vancouver|🇨🇦 Vancouver">🇨🇦 Canadá Oeste (Vancouver)</option>
         </optgroup>
+        <optgroup label="Centroamérica">
+          <option value="America/Costa_Rica|🇨🇷 Costa Rica">🇨🇷 Costa Rica · Guatemala · El Salvador</option>
+          <option value="America/Panama|🇵🇦 Panamá">🇵🇦 Panamá</option>
+        </optgroup>
         <optgroup label="Sudamérica">
           <option value="America/Argentina/Buenos_Aires|🇦🇷 Argentina">🇦🇷 Argentina</option>
           <option value="America/Sao_Paulo|🇧🇷 Brasil">🇧🇷 Brasil</option>
-          <option value="America/Bogota|🇨🇴 Colombia">🇨🇴 Colombia · Perú · Ecuador</option>
+          <option value="America/Bogota|🇨🇴 Colombia">🇨🇴 Colombia</option>
+          <option value="America/Guayaquil|🇪🇨 Ecuador">🇪🇨 Ecuador · Perú</option>
           <option value="America/Santiago|🇨🇱 Chile">🇨🇱 Chile</option>
           <option value="America/Montevideo|🇺🇾 Uruguay">🇺🇾 Uruguay · Paraguay</option>
           <option value="America/Caracas|🇻🇪 Venezuela">🇻🇪 Venezuela</option>
@@ -279,32 +292,36 @@
     localStorage.setItem('mundial.dataVersion', DATA_VERSION);
   }
 
-  // Banderas por nombre (también acepta variantes)
-  const FLAGS = {
-    'México':'🇲🇽','Canadá':'🇨🇦','Estados Unidos':'🇺🇸','USA':'🇺🇸','EE.UU.':'🇺🇸',
-    'Argentina':'🇦🇷','Brasil':'🇧🇷','Brazil':'🇧🇷','Uruguay':'🇺🇾',
-    'Colombia':'🇨🇴','Ecuador':'🇪🇨','Paraguay':'🇵🇾','Chile':'🇨🇱','Perú':'🇵🇪','Bolivia':'🇧🇴','Venezuela':'🇻🇪',
-    'España':'🇪🇸','Francia':'🇫🇷','Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Alemania':'🇩🇪','Portugal':'🇵🇹',
-    'Países Bajos':'🇳🇱','Holanda':'🇳🇱','Italia':'🇮🇹','Bélgica':'🇧🇪','Croacia':'🇭🇷',
-    'Suiza':'🇨🇭','Austria':'🇦🇹','Polonia':'🇵🇱','Dinamarca':'🇩🇰','Noruega':'🇳🇴','Suecia':'🇸🇪',
-    'Chequia':'🇨🇿','República Checa':'🇨🇿','Hungría':'🇭🇺','Serbia':'🇷🇸','Ucrania':'🇺🇦',
-    'Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Gales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','Turquía':'🇹🇷','Rumanía':'🇷🇴','Eslovenia':'🇸🇮','Eslovaquia':'🇸🇰',
-    'Bosnia y Herzegovina':'🇧🇦',
-    'Japón':'🇯🇵','Corea del Sur':'🇰🇷','Irán':'🇮🇷','Australia':'🇦🇺',
-    'Arabia Saudita':'🇸🇦','Qatar':'🇶🇦','Catar':'🇶🇦','Iraq':'🇮🇶','Irak':'🇮🇶','Jordania':'🇯🇴',
-    'Uzbekistán':'🇺🇿','Emiratos Árabes Unidos':'🇦🇪',
-    'Marruecos':'🇲🇦','Senegal':'🇸🇳','Túnez':'🇹🇳','Argelia':'🇩🇿','Egipto':'🇪🇬',
-    'Ghana':'🇬🇭','Camerún':'🇨🇲','Costa de Marfil':'🇨🇮','Sudáfrica':'🇿🇦','Nigeria':'🇳🇬',
-    'Cabo Verde':'🇨🇻','RD Congo':'🇨🇩',
-    'Costa Rica':'🇨🇷','Panamá':'🇵🇦','Honduras':'🇭🇳','Jamaica':'🇯🇲','Haití':'🇭🇹',
-    'Curazao':'🇨🇼','Nueva Zelanda':'🇳🇿',
+  // Códigos ISO para imágenes reales de banderas (flagcdn.com)
+  const FLAG_CODES = {
+    'México':'mx','Canadá':'ca','Estados Unidos':'us','USA':'us','EE.UU.':'us',
+    'Argentina':'ar','Brasil':'br','Brazil':'br','Uruguay':'uy',
+    'Colombia':'co','Ecuador':'ec','Paraguay':'py','Chile':'cl','Perú':'pe','Bolivia':'bo','Venezuela':'ve',
+    'España':'es','Francia':'fr','Inglaterra':'gb-eng','Alemania':'de','Portugal':'pt',
+    'Países Bajos':'nl','Holanda':'nl','Italia':'it','Bélgica':'be','Croacia':'hr',
+    'Suiza':'ch','Austria':'at','Polonia':'pl','Dinamarca':'dk','Noruega':'no','Suecia':'se',
+    'Chequia':'cz','República Checa':'cz','Hungría':'hu','Serbia':'rs','Ucrania':'ua',
+    'Escocia':'gb-sct','Gales':'gb-wls','Turquía':'tr','Rumanía':'ro','Eslovenia':'si','Eslovaquia':'sk',
+    'Bosnia y Herzegovina':'ba',
+    'Japón':'jp','Corea del Sur':'kr','Irán':'ir','Australia':'au',
+    'Arabia Saudita':'sa','Qatar':'qa','Catar':'qa','Iraq':'iq','Irak':'iq','Jordania':'jo',
+    'Uzbekistán':'uz','Emiratos Árabes Unidos':'ae',
+    'Marruecos':'ma','Senegal':'sn','Túnez':'tn','Argelia':'dz','Egipto':'eg',
+    'Ghana':'gh','Camerún':'cm','Costa de Marfil':'ci','Sudáfrica':'za','Nigeria':'ng',
+    'Cabo Verde':'cv','RD Congo':'cd',
+    'Costa Rica':'cr','Panamá':'pa','Honduras':'hn','Jamaica':'jm','Haití':'ht',
+    'Curazao':'cw','Nueva Zelanda':'nz',
   };
-  function flagFor(name){ return FLAGS[name] || '🏳️'; }
+  function flagFor(name){
+    const code = FLAG_CODES[name];
+    if (!code) return '<span class="flag">🏳️</span>';
+    return `<img class="flag-img" src="https://flagcdn.com/w40/${code}.png" srcset="https://flagcdn.com/w80/${code}.png 2x" alt="" loading="lazy">`;
+  }
   function escapeHTML(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function isSlot(s){ return /^([A-L][1-4]|[1-3][A-L]|3[A-L]\/[A-L]\/[A-L](\/[A-L])?|[12][A-L]|W\d+|L\d+)$/.test(s); }
   function teamHTML(name){
     if (name === 'Por confirmar') return `<span class="flag">🏳️</span><span style="color:var(--muted);font-style:italic">Por confirmar</span><span class="pencil">✎ editar</span>`;
-    return `<span class="flag">${flagFor(name)}</span><span>${escapeHTML(name)}</span><span class="pencil">✎</span>`;
+    return `${flagFor(name)}<span>${escapeHTML(name)}</span><span class="pencil">✎</span>`;
   }
   function teamInline(resolved){
     if (resolved === '—' || isSlot(resolved)) return `<span class="slot">${escapeHTML(resolved)}</span>`;
