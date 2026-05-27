@@ -198,6 +198,11 @@
     border-radius:12px;font-size:12px;color:#f3c548;line-height:1.5;
   }
   .disclaimer a{color:#f3c548;text-decoration:underline}
+  .credit{
+    text-align:center;margin:18px 0 8px;font-size:11px;
+    color:var(--muted);letter-spacing:.4px;opacity:.8;
+  }
+  .credit b{color:var(--accent);font-weight:600}
 </style>
 </head>
 <body>
@@ -216,7 +221,7 @@
       <span class="off" data-off></span>
       <select class="tz-select-overlay" id="tzCustomSelect" aria-label="Elige país/zona">
         <optgroup label="Norteamérica">
-          <option value="America/New_York|🇺🇸 EE.UU. Este">🇺🇸 EE.UU. Este (NY · Miami · Boston · NC)</option>
+          <option value="America/New_York|🇺🇸 N. Carolina">🇺🇸 North Carolina (NY · Miami · Boston)</option>
           <option value="America/Chicago|🇺🇸 EE.UU. Centro">🇺🇸 EE.UU. Centro (Dallas · Houston · KC)</option>
           <option value="America/Denver|🇺🇸 EE.UU. Mont.">🇺🇸 EE.UU. Montaña (Denver)</option>
           <option value="America/Los_Angeles|🇺🇸 EE.UU. Oeste">🇺🇸 EE.UU. Oeste (LA · SF · Seattle)</option>
@@ -579,7 +584,8 @@
       ✅ Grupos oficiales del sorteo FIFA (5 dic 2025). Fechas, sedes y horarios locales según calendario oficial.
       Confirma cualquier cambio en
       <a href="https://www.fifa.com/fifaplus/es/tournaments/mens/worldcup/canadamexicousa2026" target="_blank" rel="noopener">FIFA.com</a>.
-    </div>`;
+    </div>
+    <div class="credit">Design by <b>CesarFonseca</b></div>`;
   }
 
   // ---- Render principal ----
